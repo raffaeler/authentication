@@ -60,12 +60,28 @@ function App() {
         },
       });
 
+      if(!response.ok) {
+        let message;
+        try {
+          console.log(response);
+          var authError = response.headers.get("WWW-Authenticate");
+          message = `Fetch failed with HTTP status ${response.status} ${authError}  ${await response.text()}`;
+        }
+        catch(e) {
+          message = `Fetch failed with HTTP status ${response.status} ${response.statusText}`;
+        }
+
+        setResult(message);
+        setIsError(true);
+        return;
+      }
+
       setResult(await response.json());
       setIsError(false);
     }
     catch (e) {
       console.log(e);
-      setResult("\"" + e.message + "\"");
+      setResult(e.message);
       setIsError(true);
     }
   }

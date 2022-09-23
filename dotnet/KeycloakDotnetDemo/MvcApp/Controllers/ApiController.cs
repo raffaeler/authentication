@@ -8,7 +8,6 @@ namespace MvcApp.Controllers
     [ApiController]
     public class ApiController : ControllerBase
     {
-        //[Authorize("Otp")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("Values")]
         public IActionResult GetValues()

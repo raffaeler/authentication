@@ -29,8 +29,8 @@ namespace MvcApp
                 options.AddPolicy(corsPolicy, policy =>
                 {
                     policy
-                        .AllowAnyOrigin()
-                        //.WithOrigins("https://localhost:3443"/*, Keycloak url */)
+                        //.AllowAnyOrigin()
+                        .WithOrigins("https://localhost:3443", "https://local:3443")
                         .AllowAnyHeader()
                         .AllowAnyMethod();
                 });
@@ -135,7 +135,9 @@ namespace MvcApp
                 };
 
                 // this should never be disabled
-                // it is done in the demo because we use local dns names
+                // it is done in the demo because we use:
+                // - https://host.docker.internal:8443 from this project
+                // - https://local:8443 from the SPA client project
                 options.TokenValidationParameters.ValidateIssuer = false;
                 //options.TokenValidationParameters.ValidateAudience = false;   // use this only to test audience issues
             }
@@ -144,9 +146,29 @@ namespace MvcApp
 
             // end authentication config
 
-
-
             var app = builder.Build();
+
+#if DEBUG
+            // ===================================
+            // === Don't do this in production ===
+            // ===================================
+            // The following middleware instructs the browser not remove the 'WWW-Authenticate' header
+            // from the response which is "security-sensible" in calls made from other domains (when using CORS)
+            // In case of errors, the "WWW-Authenticate" header contains important error message
+            // ===================================
+            // Alternatively, you can see this error by making a non-CORS call using Fiddler, Postman, etc.:
+            // Headers:
+            //     Authorization: Bearer (a token)
+            //     Content-Type: application/json
+            // Call:
+            //     GET, https://localhost:5001/api/values
+            // ===================================
+            app.Use((context, next) =>
+            {
+                context.Response.Headers.Add("Access-Control-Expose-Headers", "WWW-Authenticate");
+                return next.Invoke();
+            });
+#endif
 
             app.UseCors(corsPolicy);
 
@@ -155,7 +177,6 @@ namespace MvcApp
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
