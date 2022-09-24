@@ -21,6 +21,10 @@ namespace MvcApp
         {
             var corsPolicy = "MyCorsPolicy";
             var builder = WebApplication.CreateBuilder(args);
+            //builder.WebHost.ConfigureKestrel(options =>
+            //{
+                
+            //});
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
