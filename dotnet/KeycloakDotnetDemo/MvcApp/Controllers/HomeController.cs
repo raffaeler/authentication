@@ -32,8 +32,10 @@ namespace MvcApp.Controllers
         }
 
         //[Authorize(Policy = "Otp")]
+        //[Authorize]
         public async Task<IActionResult> Privacy()
         {
+            // require the OTP imperatively
             /*
             var authResult = await _authorizationService.AuthorizeAsync(this.User, "Otp");
             if (!authResult.Succeeded)
@@ -42,7 +44,8 @@ namespace MvcApp.Controllers
                 //return Challenge();
 
                 // Calling Forbid() (HTTP 403) needs one the following code:
-                // This will invoke the CookieAuthenticationEvents.OnRedirectToAccessDenied event
+                // This will invoke the
+                // CookieAuthenticationEvents.OnRedirectToAccessDenied event
                 return Forbid();
 
                 // Calling Unauthorized() (HTTP 401) cause the client-side error

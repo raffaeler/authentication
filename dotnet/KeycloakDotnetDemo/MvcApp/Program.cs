@@ -21,12 +21,7 @@ namespace MvcApp
         {
             var corsPolicy = "MyCorsPolicy";
             var builder = WebApplication.CreateBuilder(args);
-            //builder.WebHost.ConfigureKestrel(options =>
-            //{
-                
-            //});
 
-            // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddCors(options =>
             {
@@ -44,7 +39,7 @@ namespace MvcApp
             builder.Services.Configure<AuthServerConfiguration>(authServerSection);
             var authServerConfig = authServerSection.Get<AuthServerConfiguration>();
 
-            // Start authorization config
+            // === Start authorization config ===
             // HttpContextAccessor is needed to access HttpContext from the requirement handler
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddAuthorization(options =>
@@ -54,10 +49,9 @@ namespace MvcApp
             });
 
             builder.Services.AddScoped<IAuthorizationHandler, OtpRequirementHandler>();
-            // End authorization config
+            // === End authorization config ===
 
-            // start authentication config
-
+            // === start authentication config ===
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -80,17 +74,17 @@ namespace MvcApp
                     return Task.CompletedTask;
                 },
 
-                OnRedirectToIdentityProviderForSignOut = ctx => DebugTrace("OnRedirectToIdentityProviderForSignOut"),
+                OnRedirectToIdentityProviderForSignOut = ctx => Dbg("OnRedirectToIdentityProviderForSignOut"),
 
-                OnAccessDenied = ctx => DebugTrace($"OIDC: OnAccessDenied"),
-                OnAuthenticationFailed = ctx => DebugTrace($"OIDC: OnAuthenticationFailed"),
-                OnAuthorizationCodeReceived = ctx => DebugTrace($"OIDC: OnAuthorizationCodeReceived"),
-                OnMessageReceived = ctx => DebugTrace($"OIDC: OnMessageReceived"),
-                OnRemoteSignOut = ctx => DebugTrace($"OIDC: OnRemoteSignOut"),
-                OnSignedOutCallbackRedirect = ctx => DebugTrace($"OIDC: OnSignedOutCallbackRedirect"),
-                OnTicketReceived = ctx => DebugTrace($"OIDC: OnTicketReceived"),
-                OnTokenResponseReceived = ctx => DebugTrace($"OIDC: OnTokenResponseReceived"),
-                OnTokenValidated = ctx => DebugTrace($"OIDC: OnTokenValidated"),
+                OnAccessDenied = ctx => Dbg($"OIDC: OnAccessDenied"),
+                OnAuthenticationFailed = ctx => Dbg($"OIDC: OnAuthenticationFailed"),
+                OnAuthorizationCodeReceived = ctx => Dbg($"OIDC: OnAuthorizationCodeReceived"),
+                OnMessageReceived = ctx => Dbg($"OIDC: OnMessageReceived"),
+                OnRemoteSignOut = ctx => Dbg($"OIDC: OnRemoteSignOut"),
+                OnSignedOutCallbackRedirect = ctx => Dbg($"OIDC: OnSignedOutCallbackRedirect"),
+                OnTicketReceived = ctx => Dbg($"OIDC: OnTicketReceived"),
+                OnTokenResponseReceived = ctx => Dbg($"OIDC: OnTokenResponseReceived"),
+                OnTokenValidated = ctx => Dbg($"OIDC: OnTokenValidated"),
                 OnUserInformationReceived = ctx =>
                 {
                     //var tokens = ctx.Properties.GetTokens().ToList();
@@ -102,7 +96,7 @@ namespace MvcApp
                     //    ctx.Properties.StoreTokens(tokens);
                     //}
 
-                    return DebugTrace($"OIDC: OnUserInformationReceived");
+                    return Dbg($"OIDC: OnUserInformationReceived");
                 },
 
                 OnRemoteFailure = ctx =>
@@ -126,11 +120,11 @@ namespace MvcApp
                 options.Authority = authServerConfig.Authority;
                 options.Events = new JwtBearerEvents()
                 {
-                    OnChallenge = x => DebugTrace($"JWT: Challenge "),
-                    OnMessageReceived = x => DebugTrace($"JWT: OnMessageReceived "),
-                    OnAuthenticationFailed = x => DebugTrace($"JWT: {x.Exception.ToString()}"),
-                    OnTokenValidated = x => DebugTrace($"JWT: Token has been validated: {x.Result}"),
-                    OnForbidden = x => DebugTrace($"JWT: Forbidden"),
+                    OnChallenge = x => Dbg($"JWT: Challenge "),
+                    OnMessageReceived = x => Dbg($"JWT: OnMessageReceived "),
+                    OnAuthenticationFailed = x => Dbg($"JWT: {x.Exception.ToString()}"),
+                    OnTokenValidated = x => Dbg($"JWT: Token has been validated: {x.Result}"),
+                    OnForbidden = x => Dbg($"JWT: Forbidden"),
                 };
                 
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -144,11 +138,8 @@ namespace MvcApp
                 // - https://local:8443 from the SPA client project
                 options.TokenValidationParameters.ValidateIssuer = false;
                 //options.TokenValidationParameters.ValidateAudience = false;   // use this only to test audience issues
-            }
-            );
-
-
-            // end authentication config
+            });
+            // === end authentication config ===
 
             var app = builder.Build();
 
@@ -156,13 +147,17 @@ namespace MvcApp
             // ===================================
             // === Don't do this in production ===
             // ===================================
-            // The following middleware instructs the browser not remove the 'WWW-Authenticate' header
-            // from the response which is "security-sensible" in calls made from other domains (when using CORS)
-            // In case of errors, the "WWW-Authenticate" header contains important error message
+            // The following middleware instructs the browser not to remove
+            // the 'WWW-Authenticate' header from the response.
+            // This header is "security-sensible" in calls made
+            // from other domains (when using CORS)
+            // In case of errors, the "WWW-Authenticate" header contains
+            // important error message which we show in the web page
             // ===================================
-            // Alternatively, you can see this error by making a non-CORS call using Fiddler, Postman, etc.:
+            // Alternatively, you can see this error by making
+            // a non-CORS call using Fiddler/Postman using these parameters:
             // Headers:
-            //     Authorization: Bearer (a token)
+            //     Authorization: Bearer (an access_token)
             //     Content-Type: application/json
             // Call:
             //     GET, https://localhost:5001/api/values
@@ -176,8 +171,6 @@ namespace MvcApp
 
             app.UseCors(corsPolicy);
 
-
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
@@ -201,7 +194,7 @@ namespace MvcApp
         }
 
 
-        private static Task DebugTrace(string caller)
+        private static Task Dbg(string caller)
         {
             Debug.WriteLine(caller);
             return Task.CompletedTask;
