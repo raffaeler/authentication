@@ -37,7 +37,7 @@ namespace CommonAuth
                       OnRedirectToAccessDenied = async ctx =>
                       {
                           // The default page for the Access Denied (HTTP 403):
-                          // https://localhost:5001/Account/AccessDenied?ReturnUrl=%2FHome%2FPrivacy
+                          // https://localhost:5001/Account/AccessDenied?ReturnUrl=%2FHome%2FSecret
 
                           if (ctx.HttpContext.Items["acr"] != null)
                           {
