@@ -45,21 +45,21 @@ Follow these steps:
 
 1. Create a folder on the host machine
 
-   ```
-   md H:\VMs\ContainerData\Keycloak19
-   ```
+```
+md H:\VMs\ContainerData\Keycloak19
+```
 
 2. Create the container. The `-v` option maps the Windows folder to the `data` folder of the container. The `--name` assign the container a friendly name.
 
-   ```
+```
 docker create -p 8080:8080 -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin -v H:\VMs\ContainerData\Keycloak19:/opt/keycloak/data --name KeycloakDev19 quay.io/keycloak/keycloak:19.0.1 start-dev
-   ```
+```
 
 3. Once created, the docker CLI output the following string, as described in the `WSL2` section before.
 
-   ```
-   9a68e1cdea0ddb70b0250b71572693f131993beed9516f0588b2dbd5d206e2ca
-   ```
+```
+9a68e1cdea0ddb70b0250b71572693f131993beed9516f0588b2dbd5d206e2ca
+```
 
 
 This procedure is compatible with both the standard and the custom container images.
@@ -69,8 +69,6 @@ This procedure is compatible with both the standard and the custom container ima
 In order to resolve all the problems discussed before, we can instead create a custom image with `docker build`.
 
 Since we want to use `https`, we need the certificates to inject inside the container. We also want the **private key** of the certificates which are mandatory if you'll ever want to sniff the conversation between your application and Keycloak from Wireshark. For this reason, we cannot  run the Java `keytool` as suggested by the Keycloak documentation.
-
-While we can 
 
 ### Creating the certificates for localhost
 
@@ -83,11 +81,6 @@ The `pfx` should be password protected; we will pass the password to Keycloak in
 Creating certificates for `localhost` is good enough, but you may want to add more DNS names to the SAN extension so that you can also use them for other hosts. The certificates for this demo are created with a custom tool in .NET but you can use OpenSSL or other tools. Remember that ASP.NET recognize the certificate as good when it has the following extensions "1.3.6.1.5.5.7.3.8" (timestamping), "1.3.6.1.4.1.311.84.1.1" (ASP.NET certificate version - optional) and "1.3.6.1.5.5.7.3.1" (Server authentication). The password for the certificates in this folder is "password" and, of course, should never be used in production.
 
 At least you should install the network address `host.docker.internal` to the SAN names if you want to use the "Backchannel" defined by the oAuth specifications.
-
-```
-//
-//
-```
 
 ### Installing the certificates in Windows
 
