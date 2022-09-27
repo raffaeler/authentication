@@ -18,8 +18,8 @@ const replaceState = (_user: User | void): void => {
 }
 
 const oidcConfig = {
-  metadataUrl: "https://local:8443/realms/Demo/.well-known/openid-configuration",
-  authority: "https://local:8443/realms/Demo/protocol/openid-connect/auth",
+  metadataUrl: "https://localhost:8443/realms/Demo/.well-known/openid-configuration",
+  authority: "https://localhost:8443/realms/Demo/protocol/openid-connect/auth",
   
   client_id: "ReactApp",
   //client_id: "AspNetMvc",

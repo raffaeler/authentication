@@ -33,7 +33,7 @@ namespace MvcApp.Controllers
 
         //[Authorize(Policy = "Otp")]
         //[Authorize]
-        public async Task<IActionResult> Privacy()
+        public async Task<IActionResult> Secret()
         {
             // require the OTP imperatively
             /*
