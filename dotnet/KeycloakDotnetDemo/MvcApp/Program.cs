@@ -29,7 +29,8 @@ namespace MvcApp
                 {
                     policy
                         //.AllowAnyOrigin()
-                        .WithOrigins("https://localhost:3443", "https://local:3443")
+                        .WithOrigins("https://localhost:3443", "https://local:3443",
+                                    "https://spa.iamraf.net:3443", "http://spa.iamraf.net:3000")
                         .AllowAnyHeader()
                         .AllowAnyMethod();
                 });
@@ -135,6 +136,7 @@ namespace MvcApp
                 // this should never be disabled
                 // it is done in the demo because we use:
                 // - https://host.docker.internal:8443 from this project
+                // - https://kc.iamraf.net:8443 when demo-ed by raf using a custom DNS
                 // - https://local:8443 from the SPA client project
                 options.TokenValidationParameters.ValidateIssuer = false;
                 //options.TokenValidationParameters.ValidateAudience = false;   // use this only to test audience issues

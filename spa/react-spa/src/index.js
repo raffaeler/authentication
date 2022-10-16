@@ -18,13 +18,13 @@ const replaceState = (_user: User | void): void => {
 }
 
 const oidcConfig = {
-  metadataUrl: "https://localhost:8443/realms/Demo/.well-known/openid-configuration",
-  authority: "https://localhost:8443/realms/Demo/protocol/openid-connect/auth",
+  metadataUrl: "https://kc.iamraf.net:8443/realms/Demo/.well-known/openid-configuration",
+  authority: "https://kc.iamraf.net:8443/realms/Demo/protocol/openid-connect/auth",
   
   client_id: "ReactApp",
   //client_id: "AspNetMvc",
 
-  redirect_uri: "https://localhost:3443",
+  redirect_uri: "https://spa.iamraf.net:3443",
   onSigninCallback: replaceState,
   
   loadUserInfo: true,

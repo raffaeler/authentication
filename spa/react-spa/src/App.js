@@ -54,7 +54,7 @@ function App() {
         setIsError(true);
         return;
       }
-      const response = await fetch("https://localhost:5001/api/values", {
+      const response = await fetch("https://app.iamraf.net:5001/api/values", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -23,7 +23,10 @@ internal class Program
     {
         // metadata: https://local:8443/realms/Demo/.well-known/openid-configuration
         using HttpClient ipClient = new(new HttpLogger());
-        ipClient.BaseAddress = new Uri($"https://local:8443/realms/Demo/protocol/openid-connect/");
+        ipClient.BaseAddress = 
+            new Uri($"https://kc.iamraf.net:8443/realms/Demo/protocol/openid-connect/");
+            //new Uri($"https://local:8443/realms/Demo/protocol/openid-connect/");
+
         using HttpRequestMessage ipRequest = new(HttpMethod.Post, "token");
         Dictionary<string, string> parameters = new()
         {
@@ -42,7 +45,7 @@ internal class Program
         Console.WriteLine(TokenHelpers.GetTokenText(tokenInfo?.Token ?? string.Empty));
 
         using HttpClient apiClient = new(new HttpLogger());
-        apiClient.BaseAddress = new Uri("https://localhost:5001/");
+        apiClient.BaseAddress = new Uri("https://app.iamraf.net:5001/");
         using HttpRequestMessage apiRequest = new(HttpMethod.Get, "api/values");
         apiRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokenInfo?.Token);
         var apiResponse = await apiClient.SendAsync(apiRequest, HttpCompletionOption.ResponseContentRead);
