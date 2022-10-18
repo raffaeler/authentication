@@ -4,9 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 
-namespace WebAppMvc.Policies
+namespace WebAppMvc.Policies;
+
+public class OtpRequirement : IAuthorizationRequirement
 {
-    public class OtpRequirement : IAuthorizationRequirement
-    {
-    }
 }
