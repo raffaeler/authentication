@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace WebAppMvc.Policies;
 
+/// <summary>
+/// This is the handler for the OtpRequirement
+/// </summary>
 public class OtpRequirementHandler : AuthorizationHandler<OtpRequirement>
 {
     private readonly ILogger<OtpRequirementHandler> _logger;
@@ -20,23 +23,32 @@ public class OtpRequirementHandler : AuthorizationHandler<OtpRequirement>
         _httpContextAccessor = httpContextAccessor;
     }
 
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, OtpRequirement requirement)
+    protected override Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
+        OtpRequirement requirement)
     {
         var ctx = _httpContextAccessor.HttpContext;
         var userName = context.User.Identity?.Name ?? "guest";
         if (ctx == null) return Task.CompletedTask;
 
-        ctx.Items["acr"] = "mfa";
+        // This puts "mfa" or "hwk" in the context
+        // the item in the context will be given to the Identity Provider
+        // at the next Challenge
+        ctx.Items["acr"] = requirement.Name;
 
-        var hasAcrOtp = context.User.Claims.Any(c => c.Type == "acr" && c.Value == "mfa");
+        var hasAcrOtp = context.User.Claims
+            .Any(c => c.Type == "acr" && c.Value == requirement.Name);
+
         if (hasAcrOtp)
         {
-            _logger.LogInformation($"User {userName} was authenticated with OTP");
+            _logger.LogInformation(
+                $"User {userName} was authenticated with OTP {requirement.Name}");
             context.Succeed(requirement);
             return Task.CompletedTask;
         }
 
-        _logger.LogInformation($"User {userName} fails the OTP requirement");
+        _logger.LogInformation(
+            $"User {userName} fails the OTP requirement of {requirement.Name}");
         return Task.CompletedTask;
     }
 

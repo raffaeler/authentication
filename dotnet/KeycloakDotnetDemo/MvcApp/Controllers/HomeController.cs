@@ -31,13 +31,15 @@ public class HomeController : Controller
         return View();
     }
 
-    //[Authorize(Policy = "Otp")]
+    [Authorize(Policy = "mfa")]
     //[Authorize]
     public async Task<IActionResult> Secret()
     {
-        // require the OTP imperatively
+        // require the OTP imperatively ("mfa" or "hwk")
         /*
-        var authResult = await _authorizationService.AuthorizeAsync(this.User, "Otp");
+        var authResult = await _authorizationService.AuthorizeAsync(
+            this.User, "mfa");
+
         if (!authResult.Succeeded)
         {
             // Calling Challenge invokes the authn providers
@@ -54,6 +56,13 @@ public class HomeController : Controller
         */
         return View();
     }
+
+    [Authorize(Policy = "hwk")]
+    public async Task<IActionResult> SuperSecret()
+    {
+        return View();
+    }
+
 
     public IActionResult Login()
     {

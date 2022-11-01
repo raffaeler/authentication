@@ -25,7 +25,18 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Secret">Secret</a>
                         </li>
+                        @*
+                        The following link is used for the "Super Secret" page
+                        The scenario is when using three levels of Step-Up auth which are:
+                        - Password (pwd)
+                        - TOTP Google Authenticator (mfa)
+                        - Hardware FIDO2 key (hwk)
+                        *@
 
+@*                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="SuperSecret">Super-Secret</a>
+                        </li>
+*@
                         <li class="nav-item">
                             @if (User.Identity?.IsAuthenticated ?? false)
                             {
@@ -55,7 +66,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2022 - MvcApp - <a asp-area="" asp-controller="Home" asp-action="Secret">Secret</a>
+            &copy; 2022 - MvcApp - <a asp-area="" asp-controller="Home" asp-action="Index">Home</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

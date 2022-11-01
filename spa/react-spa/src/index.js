@@ -28,7 +28,11 @@ const oidcConfig = {
   onSigninCallback: replaceState,
   
   loadUserInfo: true,
+  // mfa => Google Authenticator
+  // hwk => Hardware key
+  //
   //acr_values: "mfa",  // force the request of the OTP (requires the custom flow)
+  //acr_values: "hwk",  // force the request of the OTP (requires the custom flow)
   acr_values: "pwd",    // just ask username/password
 };
 

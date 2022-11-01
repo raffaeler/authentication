@@ -45,8 +45,11 @@ public class Program
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddAuthorization(options =>
         {
-            options.AddPolicy("Otp",
-                policy => policy.Requirements.Add(new OtpRequirement()));
+            options.AddPolicy("mfa",
+                policy => policy.Requirements.Add(new OtpRequirement("mfa")));
+
+            options.AddPolicy("hwk",
+                policy => policy.Requirements.Add(new OtpRequirement("hwk")));
         });
 
         builder.Services.AddScoped<IAuthorizationHandler, OtpRequirementHandler>();
