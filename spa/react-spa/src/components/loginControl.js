@@ -6,12 +6,12 @@ import { useAuth } from "react-oidc-context";
 function LoginControl(props) {
     const auth = useAuth();
 
-    const removeSessionStorageOidc = () => {
-        var oidcKeys = Object.keys(sessionStorage)
-            .filter((key) => key.startsWith('oidc.user'));
-        //console.log(oidcKeys);
-        oidcKeys.forEach(k => sessionStorage.removeItem(k));
-    }
+    // const removeSessionStorageOidc = () => {
+    //     var oidcKeys = Object.keys(sessionStorage)
+    //         .filter((key) => key.startsWith('oidc.user'));
+    //     //console.log(oidcKeys);
+    //     oidcKeys.forEach(k => sessionStorage.removeItem(k));
+    // }
 
     const login = async () => {
         await auth.signinRedirect();
@@ -37,7 +37,7 @@ function LoginControl(props) {
     const logoutAndRevoke = async () => {
         await auth.revokeTokens(["access_token", "refresh_token"]);
         await auth.removeUser();
-        removeSessionStorageOidc();
+        //removeSessionStorageOidc();
         props.onLogout();
     }
 
