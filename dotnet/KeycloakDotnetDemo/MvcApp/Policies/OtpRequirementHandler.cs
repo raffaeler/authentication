@@ -14,6 +14,12 @@ public class OtpRequirementHandler : AuthorizationHandler<OtpRequirement>
 {
     private readonly ILogger<OtpRequirementHandler> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private Dictionary<string, int> Acr2Loa = new Dictionary<string, int>
+    {
+        { "pwd", 1 },
+        { "mfa", 2 },
+        { "hwk", 3 },
+    };
 
     public OtpRequirementHandler(
         ILogger<OtpRequirementHandler> logger,
@@ -36,15 +42,20 @@ public class OtpRequirementHandler : AuthorizationHandler<OtpRequirement>
         // at the next Challenge
         ctx.Items["acr"] = requirement.Name;
 
-        var hasAcrOtp = context.User.Claims
-            .Any(c => c.Type == "acr" && c.Value == requirement.Name);
-
-        if (hasAcrOtp)
+        var acrClaim = context.User.Claims.FirstOrDefault(c => c.Type == "acr");
+        if(acrClaim != null)
         {
-            _logger.LogInformation(
-                $"User {userName} was authenticated with OTP {requirement.Name}");
-            context.Succeed(requirement);
-            return Task.CompletedTask;
+            if(Acr2Loa.TryGetValue(acrClaim.Value, out int currentLoa) &&
+                Acr2Loa.TryGetValue(requirement.Name, out int requiredLoa))
+            {
+                if(currentLoa >= requiredLoa)
+                {
+                    _logger.LogInformation(
+                        $"User {userName} was authenticated with OTP {requirement.Name}");
+                    context.Succeed(requirement);
+                    return Task.CompletedTask;
+                }
+            }
         }
 
         _logger.LogInformation(

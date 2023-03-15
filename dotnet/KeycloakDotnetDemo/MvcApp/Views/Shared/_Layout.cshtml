@@ -33,10 +33,10 @@
                         - Hardware FIDO2 key (hwk)
                         *@
 
-@*                        <li class="nav-item">
+                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="SuperSecret">Super-Secret</a>
                         </li>
-*@
+
                         <li class="nav-item">
                             @if (User.Identity?.IsAuthenticated ?? false)
                             {

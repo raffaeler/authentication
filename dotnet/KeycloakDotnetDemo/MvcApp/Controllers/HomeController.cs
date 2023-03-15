@@ -10,6 +10,7 @@ using MvcApp.Models;
 
 namespace MvcApp.Controllers;
 
+[Controller]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;

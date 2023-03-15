@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
 
 using CommonAuth;
 
@@ -23,6 +24,8 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddControllersWithViews();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(corsPolicy, policy =>
@@ -118,6 +121,15 @@ public class Program
         })
         .AddJwtBearer(options =>
         {
+            var jwtHandler = (options.SecurityTokenValidators.FirstOrDefault() as JwtSecurityTokenHandler);
+            if (jwtHandler != null)
+            {
+                // false: use the short names. For example: "acr"
+                // true: use the long uri type names
+                // names are used into the requirements to search the claims
+                jwtHandler.MapInboundClaims = false;
+            }
+
             options.MetadataAddress = authServerConfig.MetadataAddress;
             options.RequireHttpsMetadata = false;
             options.Audience = "AspNetMvc";
@@ -175,6 +187,8 @@ public class Program
 #endif
 
         app.UseCors(corsPolicy);
+        app.UseSwagger();
+        app.UseSwaggerUI();
 
         if (!app.Environment.IsDevelopment())
         {
@@ -183,17 +197,22 @@ public class Program
         }
 
         app.UseHttpsRedirection();
-
         app.UseAuthentication();    // Add the default ASP.NET Core Authentication Service
         app.UseStaticFiles();
-
         app.UseRouting();
 
         app.UseAuthorization();
+        app.MapFallbackToFile("/index.html");
 
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
+        //_ = app.UseEndpoints(endpoints =>
+        //{
+        //    endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+        //    endpoints.MapControllers();
+        //    endpoints.MapFallbackToFile("/index.html");
+        //});
 
         app.Run();
     }
