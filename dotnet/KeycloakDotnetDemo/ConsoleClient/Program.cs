@@ -2,10 +2,17 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Runtime.ConstrainedExecution;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Policy;
 using System.Text.Json;
 using System.Threading.Tasks;
 
 using CommonAuth;
+
+using static System.Formats.Asn1.AsnWriter;
 
 namespace ConsoleClient;
 
@@ -14,7 +21,8 @@ internal class Program
     static async Task Main(string[] args)
     {
         //await new Program().Start_ClientCredentials();
-        await new Program().Start_PasswordGrant();
+        //await new Program().Start_PasswordGrant();
+        await new Program().Start_ClientCert();
         Console.ReadKey();
     }
 
@@ -24,9 +32,9 @@ internal class Program
     {
         // metadata: https://local:8443/realms/Demo/.well-known/openid-configuration
         using HttpClient ipClient = new(new HttpLogger());
-        ipClient.BaseAddress = 
+        ipClient.BaseAddress =
             new Uri($"https://kc.iamraf.net:8443/realms/Demo/protocol/openid-connect/");
-            //new Uri($"https://local:8443/realms/Demo/protocol/openid-connect/");
+        //new Uri($"https://local:8443/realms/Demo/protocol/openid-connect/");
 
         using HttpRequestMessage ipRequest = new(HttpMethod.Post, "token");
         Dictionary<string, string> parameters = new()
@@ -108,6 +116,37 @@ internal class Program
         apiResponse.EnsureSuccessStatusCode();
         var apiContent = await apiResponse.Content.ReadAsStringAsync();
         Console.WriteLine(apiContent);
+    }
+
+    private async Task Start_ClientCert()
+    {
+        var cert = CertificatesHelper.FindByClientAuth(issuerFilter: "Rialdi");
+
+        OidcAuthorizationCodeFlow codeFlow = new(
+            metadataUrl: "https://local:8443/realms/Demo/.well-known/openid-configuration",
+            clientId: "Unattended",
+            redirectUri: "https://app.iamraf.net:5001/",
+            clientCertificate: cert);
+
+        codeFlow.EnableVerboseLogging = true;
+
+        var jwtJson = await codeFlow.RequestJwt();
+        var tokenInfo = JsonSerializer.Deserialize<TokenInfo>(jwtJson);
+        var jwt = tokenInfo?.Token ?? throw new Exception($"Invalid JWT");
+        Console.WriteLine(TokenHelpers.GetTokenText(jwt));
+        await MakeApiRequest(jwt);
+    }
+
+    private async Task MakeApiRequest(string jwt)
+    {
+        using HttpClient client = new(new HttpLogger());
+        client.BaseAddress = new Uri("https://app.iamraf.net:5001/");
+        using HttpRequestMessage request = new(HttpMethod.Get, "api/values/ValuesPlain");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+        var response = await client.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+        response.EnsureSuccessStatusCode();
+        var content = await response.Content.ReadAsStringAsync();
+        Console.WriteLine(content);
     }
 
 }

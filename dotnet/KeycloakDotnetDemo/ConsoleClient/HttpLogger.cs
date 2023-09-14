@@ -38,7 +38,9 @@ internal class HttpLogger : DelegatingHandler
 
         HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
 
-        Console.ForegroundColor = ConsoleColor.Green;
+        Console.ForegroundColor = response.IsSuccessStatusCode
+                ? ConsoleColor.Green
+                : ConsoleColor.Red;
         Console.WriteLine("Response:");
         Console.ForegroundColor = defaultColor;
 
@@ -47,7 +49,9 @@ internal class HttpLogger : DelegatingHandler
         {
             var body = await response.Content.ReadAsStringAsync();
 
-            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.ForegroundColor = response.IsSuccessStatusCode
+                ? ConsoleColor.DarkGray
+                : ConsoleColor.Red;
             Console.WriteLine(body);
             Console.ForegroundColor = defaultColor;
         }

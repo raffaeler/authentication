@@ -109,10 +109,35 @@ public static class KeycloakServiceExtensions
         AuthServerConfiguration authServerConfiguration)
     {
         var signOutPath = new PathString(authServerConfiguration.SignOutPath);
-        return controller.SignOut(new AuthenticationProperties() { RedirectUri = signOutPath },
+        return controller.SignOut(new AuthenticationProperties()
+            { RedirectUri = signOutPath },
             OpenIdConnectDefaults.AuthenticationScheme,
             CookieAuthenticationDefaults.AuthenticationScheme);
     }
+
+    public static ChallengeResult SignIn(
+        this Microsoft.AspNetCore.Mvc.RazorPages.PageModel pageModel,
+        AuthServerConfiguration authServerConfiguration)
+    {
+        var signInPath = new PathString(authServerConfiguration.SignInPath);
+        return pageModel.Challenge(new AuthenticationProperties() { RedirectUri = signInPath },
+            OpenIdConnectDefaults.AuthenticationScheme);
+          //CookieAuthenticationDefaults.AuthenticationScheme);
+    }
+
+    public static SignOutResult SignOut(
+        this Microsoft.AspNetCore.Mvc.RazorPages.PageModel pageModel,
+        AuthServerConfiguration authServerConfiguration)
+    {
+        var signOutPath = new PathString(authServerConfiguration.SignOutPath);
+        return pageModel.SignOut(new AuthenticationProperties()
+            { RedirectUri = signOutPath },
+            OpenIdConnectDefaults.AuthenticationScheme,
+            CookieAuthenticationDefaults.AuthenticationScheme);
+    }
+
+
+
 }
 
 

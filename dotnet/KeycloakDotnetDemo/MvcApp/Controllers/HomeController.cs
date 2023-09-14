@@ -67,11 +67,13 @@ public class HomeController : Controller
 
     public IActionResult Login()
     {
+        // extension method defined in CommonAuth
         return this.SignIn(_authServerConfiguration);
     }
 
     public IActionResult Logout()
     {
+        // extension method defined in CommonAuth
         return this.SignOut(_authServerConfiguration);
     }
 
